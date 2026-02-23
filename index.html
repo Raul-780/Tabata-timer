@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tabata Timer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0f0f0f;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  h1 { font-size: 1.4rem; letter-spacing: 6px; color: #fff; margin-bottom: 30px; text-transform: uppercase; }
+
+  .phase {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    margin-top: 20px;
+    margin-bottom: 4px;
+    transition: color 0.3s;
+  }
+  .phase.work { color: #4dff91; }
+  .phase.rest { color: #ff4d4d; }
+  .phase.ready { color: #4d9fff; }
+
+  .timer {
+    font-size: 7rem;
+    font-weight: 900;
+    line-height: 1;
+    margin: 10px 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .progress-ring {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    margin: 10px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .progress-ring svg {
+    position: absolute;
+    top: 0; left: 0;
+    transform: rotate(-90deg);
+  }
+  .progress-ring circle {
+    fill: none;
+    stroke-width: 8;
+  }
+  .ring-bg { stroke: #222; }
+  .ring-fg { stroke: #ff4d4d; transition: stroke-dashoffset 0.5s linear, stroke 0.3s; }
+  .ring-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  .rounds {
+    font-size: 1rem;
+    color: #888;
+    margin: 10px 0 6px;
+    letter-spacing: 2px;
+  }
+  .rounds span { color: #fff; font-weight: 700; font-size: 1.2rem; }
+
+  .round-dots {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 320px;
+  }
+  .dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #333;
+    transition: background 0.3s;
+  }
+  .dot.done { background: #ff4d4d; }
+  .dot.active { background: #fff; }
+
+  .controls { display: flex; gap: 14px; margin-bottom: 30px; }
+  button {
+    border: none; cursor: pointer; border-radius: 50px;
+    font-size: 1rem; font-weight: 600; letter-spacing: 1px;
+    padding: 14px 32px;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  button:active { transform: scale(0.96); }
+  .btn-start { background: #ff4d4d; color: #fff; }
+  .btn-pause { background: #ffaa00; color: #000; }
+  .btn-reset { background: #222; color: #aaa; }
+
+  .settings {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    width: 100%;
+    max-width: 340px;
+  }
+  .setting {
+    background: #1a1a1a;
+    border-radius: 14px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .setting label { font-size: 0.65rem; color: #fff; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 6px; }
+  .setting-val { font-size: 1.4rem; font-weight: 700; }
+  .setting-btns { display: flex; justify-content: center; gap: 6px; margin-top: 6px; }
+  .setting-btns button {
+    padding: 4px 10px;
+    font-size: 1rem;
+    background: #333;
+    color: #fff;
+    border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<h1>Tabata</h1>
+
+<div class="progress-ring">
+  <svg width="260" height="260" viewBox="0 0 260 260">
+    <circle class="ring-bg" cx="130" cy="130" r="118"/>
+    <circle class="ring-fg" id="ringFg" cx="130" cy="130" r="118"/>
+  </svg>
+  <div class="ring-center">
+    <div class="phase ready" id="phaseLabel">LISTO</div>
+    <div class="timer" id="timerDisplay">20</div>
+  </div>
+</div>
+
+<div class="rounds">RONDA <span id="roundDisplay">1</span> / <span id="totalRoundsDisplay">8</span></div>
+<div class="round-dots" id="roundDots"></div>
+
+<div class="controls">
+  <button class="btn-reset" id="btnReset" onclick="reset()">↺</button>
+  <button class="btn-start" id="btnStart" onclick="toggleStartPause()">INICIAR</button>
+</div>
+
+<div class="settings">
+  <div class="setting">
+    <label>Trabajo</label>
+    <div class="setting-val" id="workVal">20s</div>
+    <div class="setting-btns">
+      <button onclick="adjustSetting('work',-5)">−</button>
+      <button onclick="adjustSetting('work',5)">+</button>
+    </div>
+  </div>
+  <div class="setting">
+    <label>Descanso</label>
+    <div class="setting-val" id="restVal">10s</div>
+    <div class="setting-btns">
+      <button onclick="adjustSetting('rest',-5)">−</button>
+      <button onclick="adjustSetting('rest',5)">+</button>
+    </div>
+  </div>
+  <div class="setting">
+    <label>Rondas</label>
+    <div class="setting-val" id="roundsVal">8</div>
+    <div class="setting-btns">
+      <button onclick="adjustSetting('rounds',-1)">−</button>
+      <button onclick="adjustSetting('rounds',1)">+</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CIRCUMFERENCE = 2 * Math.PI * 118;
+const ringFg = document.getElementById('ringFg');
+ringFg.style.strokeDasharray = CIRCUMFERENCE;
+ringFg.style.strokeDashoffset = 0;
+
+let settings = { work: 20, rest: 10, rounds: 8 };
+let state = { running: false, phase: 'work', round: 1, timeLeft: 20, total: 20 };
+let interval = null;
+
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let ctx = null;
+
+function beep(freq, dur, vol = 0.4) {
+  if (!ctx) ctx = new AudioCtx();
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(vol, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+  o.start(); o.stop(ctx.currentTime + dur);
+}
+
+function beepWork() { beep(880, 0.15); setTimeout(() => beep(880, 0.15), 180); }
+function beepRest() { beep(440, 0.3); }
+function beepCountdown() { beep(660, 0.1); }
+function beepFinish() {
+  [0, 150, 300, 500].forEach((t, i) => setTimeout(() => beep(880 + i*110, 0.2), t));
+}
+
+function updateDots() {
+  const el = document.getElementById('roundDots');
+  el.innerHTML = '';
+  for (let i = 1; i <= settings.rounds; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < state.round ? ' done' : i === state.round ? ' active' : '');
+    el.appendChild(d);
+  }
+}
+
+function updateRing(timeLeft, total) {
+  const pct = timeLeft / total;
+  ringFg.style.strokeDashoffset = CIRCUMFERENCE * (1 - pct);
+}
+
+function updatePhaseColor() {
+  const lbl = document.getElementById('phaseLabel');
+  const isWork = state.phase === 'work';
+  lbl.className = 'phase ' + (state.running ? (isWork ? 'work' : 'rest') : 'ready');
+  ringFg.style.stroke = state.running ? (isWork ? '#4dff91' : '#ff4d4d') : '#4d9fff';
+}
+
+function render() {
+  document.getElementById('timerDisplay').textContent = state.timeLeft;
+  document.getElementById('roundDisplay').textContent = state.round;
+  document.getElementById('totalRoundsDisplay').textContent = settings.rounds;
+  document.getElementById('phaseLabel').textContent =
+    state.running ? (state.phase === 'work' ? 'TRABAJA' : 'DESCANSA') : 'LISTO';
+  updatePhaseColor();
+  updateRing(state.timeLeft, state.total);
+  updateDots();
+}
+
+function tick() {
+  if (state.timeLeft <= 3 && state.timeLeft > 0) beepCountdown();
+  state.timeLeft--;
+  if (state.timeLeft < 0) {
+    if (state.phase === 'work') {
+      state.phase = 'rest';
+      state.timeLeft = settings.rest;
+      state.total = settings.rest;
+      beepRest();
+    } else {
+      if (state.round >= settings.rounds) {
+        clearInterval(interval);
+        state.running = false;
+        state.timeLeft = 0;
+        document.getElementById('phaseLabel').textContent = '¡LISTO!';
+        document.getElementById('btnStart').textContent = 'INICIAR';
+        beepFinish();
+        render();
+        return;
+      }
+      state.round++;
+      state.phase = 'work';
+      state.timeLeft = settings.work;
+      state.total = settings.work;
+      beepWork();
+    }
+  }
+  render();
+}
+
+function toggleStartPause() {
+  if (!ctx) ctx = new AudioCtx();
+  if (state.running) {
+    clearInterval(interval);
+    state.running = false;
+    document.getElementById('btnStart').textContent = 'CONTINUAR';
+    document.getElementById('phaseLabel').textContent = 'PAUSADO';
+    document.getElementById('phaseLabel').className = 'phase ready';
+  } else {
+    state.running = true;
+    document.getElementById('btnStart').textContent = 'PAUSA';
+    beepWork();
+    render();
+    interval = setInterval(tick, 1000);
+  }
+}
+
+function reset() {
+  clearInterval(interval);
+  state = { running: false, phase: 'work', round: 1, timeLeft: settings.work, total: settings.work };
+  document.getElementById('btnStart').textContent = 'INICIAR';
+  ringFg.style.stroke = '#4d9fff';
+  render();
+}
+
+function adjustSetting(key, delta) {
+  if (state.running) return;
+  const min = key === 'rounds' ? 1 : 5;
+  settings[key] = Math.max(min, settings[key] + delta);
+  document.getElementById(key + 'Val').textContent = settings[key] + (key === 'rounds' ? '' : 's');
+  document.getElementById('totalRoundsDisplay').textContent = settings.rounds;
+  if (key === 'work') { state.timeLeft = settings.work; state.total = settings.work; }
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
