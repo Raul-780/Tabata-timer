@@ -255,6 +255,7 @@ function tick() {
       if (state.round >= settings.rounds) {
         clearInterval(interval);
         state.running = false;
+        releaseWakeLock();
         state.timeLeft = 0;
         document.getElementById('phaseLabel').textContent = '¡LISTO!';
         document.getElementById('btnStart').textContent = 'INICIAR';
@@ -272,16 +273,32 @@ function tick() {
   render();
 }
 
+let wakeLock = null;
+
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+    }
+  } catch(e) {}
+}
+
+function releaseWakeLock() {
+  if (wakeLock) { wakeLock.release(); wakeLock = null; }
+}
+
 function toggleStartPause() {
   if (!ctx) ctx = new AudioCtx();
   if (state.running) {
     clearInterval(interval);
     state.running = false;
+    releaseWakeLock();
     document.getElementById('btnStart').textContent = 'CONTINUAR';
     document.getElementById('phaseLabel').textContent = 'PAUSADO';
     document.getElementById('phaseLabel').className = 'phase ready';
   } else {
     state.running = true;
+    requestWakeLock();
     document.getElementById('btnStart').textContent = 'PAUSA';
     beepWork();
     render();
