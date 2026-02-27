@@ -7,130 +7,67 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background: #0f0f0f;
-    color: #fff;
+    background: #0f0f0f; color: #fff;
     font-family: 'Segoe UI', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 20px;
   }
-  h1 { font-size: 1.4rem; letter-spacing: 6px; color: #fff; margin-bottom: 30px; text-transform: uppercase; }
+  h1 { font-size: 1.4rem; letter-spacing: 6px; color: #fff; margin-bottom: 16px; text-transform: uppercase; }
 
-  .phase {
-    font-size: 1.6rem;
-    font-weight: 700;
-    letter-spacing: 4px;
-    margin-top: 20px;
-    margin-bottom: 4px;
-    transition: color 0.3s;
+  .mode-selector { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; justify-content: center; }
+  .mode-btn {
+    padding: 7px 16px; border-radius: 50px; border: 2px solid #333;
+    background: transparent; color: #888; font-size: 0.75rem;
+    font-weight: 600; letter-spacing: 1px; cursor: pointer; transition: all 0.2s;
   }
+  .mode-btn.active { border-color: #fff; color: #fff; background: #222; }
+
+  .phase { font-size: 1.6rem; font-weight: 700; letter-spacing: 4px; margin-top: 20px; margin-bottom: 4px; transition: color 0.3s; }
   .phase.work { color: #4dff91; }
   .phase.rest { color: #ff4d4d; }
   .phase.ready { color: #4d9fff; }
 
-  .timer {
-    font-size: 7rem;
-    font-weight: 900;
-    line-height: 1;
-    margin: 10px 0;
-    font-variant-numeric: tabular-nums;
-  }
+  .timer { font-size: clamp(3rem, 16vw, 7rem); font-weight: 900; line-height: 1; margin: 10px 0; font-variant-numeric: tabular-nums; }
 
-  .progress-ring {
-    position: relative;
-    width: 260px;
-    height: 260px;
-    margin: 10px auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .progress-ring svg {
-    position: absolute;
-    top: 0; left: 0;
-    transform: rotate(-90deg);
-  }
-  .progress-ring circle {
-    fill: none;
-    stroke-width: 8;
-  }
+  .progress-ring { position: relative; width: 260px; height: 260px; margin: 10px auto; display: flex; align-items: center; justify-content: center; }
+  .progress-ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+  .progress-ring circle { fill: none; stroke-width: 8; }
   .ring-bg { stroke: #222; }
-  .ring-fg { stroke: #ff4d4d; transition: stroke-dashoffset 0.5s linear, stroke 0.3s; }
-  .ring-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 1;
-  }
+  .ring-fg { stroke: #4d9fff; transition: stroke-dashoffset 0.5s linear, stroke 0.3s; }
+  .ring-center { display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; }
 
-  .rounds {
-    font-size: 1rem;
-    color: #888;
-    margin: 10px 0 6px;
-    letter-spacing: 2px;
-  }
+  .rounds { font-size: 1rem; color: #888; margin: 10px 0 6px; letter-spacing: 2px; }
   .rounds span { color: #fff; font-weight: 700; font-size: 1.2rem; }
-
-  .round-dots {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: 320px;
-  }
-  .dot {
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: #333;
-    transition: background 0.3s;
-  }
-  .dot.done { background: #ff4d4d; }
+  .round-dots { display: flex; gap: 8px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center; max-width: 320px; min-height: 20px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: #333; transition: background 0.3s; }
+  .dot.done { background: #4dff91; }
   .dot.active { background: #fff; }
 
   .controls { display: flex; gap: 14px; margin-bottom: 30px; }
-  button {
-    border: none; cursor: pointer; border-radius: 50px;
-    font-size: 1rem; font-weight: 600; letter-spacing: 1px;
-    padding: 14px 32px;
-    transition: opacity 0.2s, transform 0.1s;
-  }
+  button { border: none; cursor: pointer; border-radius: 50px; font-size: 1rem; font-weight: 600; letter-spacing: 1px; padding: 14px 32px; transition: opacity 0.2s, transform 0.1s; }
   button:active { transform: scale(0.96); }
-  .btn-start { background: #ff4d4d; color: #fff; }
-  .btn-pause { background: #ffaa00; color: #000; }
+  .btn-start { background: #4dff91; color: #000; }
   .btn-reset { background: #222; color: #aaa; }
 
-  .settings {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    width: 100%;
-    max-width: 340px;
-  }
-  .setting {
-    background: #1a1a1a;
-    border-radius: 14px;
-    padding: 12px 8px;
-    text-align: center;
-  }
+  .settings { display: flex; gap: 12px; width: 100%; max-width: 340px; justify-content: center; flex-wrap: wrap; }
+  .setting { background: #1a1a1a; border-radius: 14px; padding: 12px 8px; text-align: center; min-width: 90px; }
   .setting label { font-size: 0.65rem; color: #fff; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 6px; }
-  .setting-val { font-size: 1.4rem; font-weight: 700; }
+  .setting-val { font-size: 1.4rem; font-weight: 700; cursor: pointer; border-bottom: 1px dashed #555; }
+  .setting-val:hover { border-color: #fff; }
+  .setting-input { font-size: 1.2rem; font-weight: 700; width: 70px; text-align: center; background: #333; color: #fff; border: 1px solid #fff; border-radius: 8px; padding: 2px 4px; outline: none; }
   .setting-btns { display: flex; justify-content: center; gap: 6px; margin-top: 6px; }
-  .setting-btns button {
-    padding: 4px 10px;
-    font-size: 1rem;
-    background: #333;
-    color: #fff;
-    border-radius: 8px;
-  }
+  .setting-btns button { padding: 4px 10px; font-size: 1rem; background: #333; color: #fff; border-radius: 8px; }
 </style>
 </head>
 <body>
 <h1>Tabata</h1>
+
+<div class="mode-selector">
+  <button class="mode-btn active" data-mode="tabata" onclick="setMode('tabata',this)">TABATA</button>
+  <button class="mode-btn" data-mode="emom" onclick="setMode('emom',this)">EMOM</button>
+  <button class="mode-btn" data-mode="amrap" onclick="setMode('amrap',this)">AMRAP</button>
+  <button class="mode-btn" data-mode="countdown" onclick="setMode('countdown',this)">CUENTA ATRÁS</button>
+</div>
 
 <div class="progress-ring">
   <svg width="260" height="260" viewBox="0 0 260 260">
@@ -143,187 +80,279 @@
   </div>
 </div>
 
-<div class="rounds">RONDA <span id="roundDisplay">1</span> / <span id="totalRoundsDisplay">8</span></div>
+<div class="rounds" id="roundsInfo">RONDA <span id="roundDisplay">1</span> / <span id="totalRoundsDisplay">8</span></div>
 <div class="round-dots" id="roundDots"></div>
 
 <div class="controls">
-  <button class="btn-reset" id="btnReset" onclick="reset()">↺</button>
+  <button class="btn-reset" onclick="reset()">↺</button>
   <button class="btn-start" id="btnStart" onclick="toggleStartPause()">INICIAR</button>
 </div>
 
-<div class="settings">
-  <div class="setting">
-    <label>Trabajo</label>
-    <div class="setting-val" id="workVal">20s</div>
-    <div class="setting-btns">
-      <button onclick="adjustSetting('work',-5)">−</button>
-      <button onclick="adjustSetting('work',5)">+</button>
-    </div>
-  </div>
-  <div class="setting">
-    <label>Descanso</label>
-    <div class="setting-val" id="restVal">10s</div>
-    <div class="setting-btns">
-      <button onclick="adjustSetting('rest',-5)">−</button>
-      <button onclick="adjustSetting('rest',5)">+</button>
-    </div>
-  </div>
-  <div class="setting">
-    <label>Rondas</label>
-    <div class="setting-val" id="roundsVal">8</div>
-    <div class="setting-btns">
-      <button onclick="adjustSetting('rounds',-1)">−</button>
-      <button onclick="adjustSetting('rounds',1)">+</button>
-    </div>
-  </div>
-</div>
+<div class="settings" id="settingsPanel"></div>
 
 <script>
+// ── Constants ──────────────────────────────────────────────
 const CIRCUMFERENCE = 2 * Math.PI * 118;
 const ringFg = document.getElementById('ringFg');
 ringFg.style.strokeDasharray = CIRCUMFERENCE;
-ringFg.style.strokeDashoffset = 0;
 
-let settings = { work: 20, rest: 10, rounds: 8 };
-let state = { running: false, phase: 'work', round: 1, timeLeft: 20, total: 20 };
-let interval = null;
+const MODE_DEFAULTS = {
+  tabata:    { work: 20, rest: 10, rounds: 8 },
+  emom:      { interval: 60, rounds: 10 },
+  amrap:     { total: 1200 },
+  countdown: { total: 60 }
+};
 
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-let ctx = null;
+const MODE_FIELDS = {
+  tabata:    [['work','Trabajo','s',5], ['rest','Descanso','s',5], ['rounds','Rondas','',1]],
+  emom:      [['interval','Intervalo','s',5], ['rounds','Rondas','',1]],
+  amrap:     [['total','Tiempo','s',5]],
+  countdown: [['total','Tiempo','s',5]]
+};
 
+// ── State ──────────────────────────────────────────────────
+let currentMode = 'tabata';
+let settings = { ...MODE_DEFAULTS.tabata };
+let state = {};
+let ticker = null;
+let audioCtx = null;
+let wakeLock = null;
+
+// ── Audio ──────────────────────────────────────────────────
 function beep(freq, dur, vol = 0.4) {
-  if (!ctx) ctx = new AudioCtx();
-  const o = ctx.createOscillator();
-  const g = ctx.createGain();
-  o.connect(g); g.connect(ctx.destination);
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.connect(g); g.connect(audioCtx.destination);
   o.frequency.value = freq;
-  g.gain.setValueAtTime(vol, ctx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-  o.start(); o.stop(ctx.currentTime + dur);
+  g.gain.setValueAtTime(vol, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+  o.start(); o.stop(audioCtx.currentTime + dur);
 }
-
-function beepWork() { beep(880, 0.15); setTimeout(() => beep(880, 0.15), 180); }
-function beepRest() { beep(440, 0.3); }
+function beepWork()      { beep(880, 0.15); setTimeout(() => beep(880, 0.15), 180); }
+function beepRest()      { beep(440, 0.3); }
 function beepCountdown() { beep(660, 0.1); }
-function beepFinish() {
-  [0, 150, 300, 500].forEach((t, i) => setTimeout(() => beep(880 + i*110, 0.2), t));
+function beepFinish()    { [0,150,300,500].forEach((t,i) => setTimeout(() => beep(880+i*110, 0.2), t)); }
+
+// ── Wake Lock ──────────────────────────────────────────────
+async function requestWakeLock() {
+  try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+}
+function releaseWakeLock() {
+  if (wakeLock) { wakeLock.release(); wakeLock = null; }
 }
 
-function updateDots() {
-  const el = document.getElementById('roundDots');
-  el.innerHTML = '';
-  for (let i = 1; i <= settings.rounds; i++) {
-    const d = document.createElement('div');
-    d.className = 'dot' + (i < state.round ? ' done' : i === state.round ? ' active' : '');
-    el.appendChild(d);
+// ── Time helpers ───────────────────────────────────────────
+function toMMSS(s) {
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+function parseMMSS(str) {
+  str = str.trim();
+  if (str.includes(':')) {
+    const parts = str.split(':');
+    const m = parseInt(parts[0]), s = parseInt(parts[1]);
+    if (isNaN(m) || isNaN(s)) return null;
+    return m * 60 + s;
+  }
+  const n = parseInt(str);
+  return isNaN(n) ? null : n;
+}
+function displayVal(key, unit) {
+  const v = settings[key];
+  if (unit === 's') return v >= 60 ? toMMSS(v) : v + 's';
+  return v + unit;
+}
+function formatTimerVal(s) {
+  if (s >= 60) {
+    document.getElementById('timerDisplay').style.fontSize = 'clamp(2rem, 9vw, 4rem)';
+    return toMMSS(s);
+  }
+  document.getElementById('timerDisplay').style.fontSize = 'clamp(3rem, 16vw, 7rem)';
+  return s;
+}
+
+// ── Settings UI ────────────────────────────────────────────
+function buildSettings() {
+  const p = document.getElementById('settingsPanel');
+  p.innerHTML = '';
+  MODE_FIELDS[currentMode].forEach(([key, label, unit, step]) => {
+    const dv = displayVal(key, unit);
+    const div = document.createElement('div');
+    div.className = 'setting';
+    div.innerHTML = `
+      <label>${label}</label>
+      <div class="setting-val" id="val_${key}">${dv}</div>
+      <div class="setting-btns">
+        <button>−</button><button>+</button>
+      </div>`;
+    const btns = div.querySelectorAll('.setting-btns button');
+    btns[0].onclick = () => adjustSetting(key, -step, unit);
+    btns[1].onclick = () => adjustSetting(key,  step, unit);
+    div.querySelector('.setting-val').onclick = () => startEdit(key, unit, step);
+    p.appendChild(div);
+  });
+}
+
+function adjustSetting(key, delta, unit) {
+  if (state.running) return;
+  const min = key === 'rounds' ? 1 : 5;
+  settings[key] = Math.max(min, settings[key] + delta);
+  const el = document.getElementById('val_' + key);
+  if (el) el.textContent = displayVal(key, unit);
+  initState(); render();
+}
+
+function startEdit(key, unit) {
+  if (state.running) return;
+  const el = document.getElementById('val_' + key);
+  const isTime = unit === 's';
+  const current = isTime ? toMMSS(settings[key]) : settings[key];
+  el.innerHTML = `<input class="setting-input" value="${current}" maxlength="6">`;
+  const inp = el.querySelector('input');
+  inp.focus(); inp.select();
+
+  function commit() {
+    let val = isTime ? parseMMSS(inp.value) : parseInt(inp.value);
+    const min = key === 'rounds' ? 1 : 5;
+    if (val === null || isNaN(val) || val < min) val = settings[key];
+    settings[key] = val;
+    el.textContent = displayVal(key, unit);
+    initState(); render();
+  }
+  inp.addEventListener('blur', commit);
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') inp.blur(); });
+}
+
+// ── Mode ───────────────────────────────────────────────────
+function setMode(mode, btn) {
+  if (state.running) return;
+  currentMode = mode;
+  settings = { ...MODE_DEFAULTS[mode] };
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildSettings();
+  initState();
+  render();
+}
+
+// ── Timer state ────────────────────────────────────────────
+function initState() {
+  const s = settings;
+  if (currentMode === 'tabata') {
+    state = { running: false, phase: 'work', round: 1, timeLeft: s.work, total: s.work };
+  } else if (currentMode === 'emom') {
+    state = { running: false, phase: 'work', round: 1, timeLeft: s.interval, total: s.interval };
+  } else {
+    state = { running: false, phase: 'work', round: 1, timeLeft: s.total, total: s.total };
   }
 }
 
-function updateRing(timeLeft, total) {
-  const pct = timeLeft / total;
-  ringFg.style.strokeDashoffset = CIRCUMFERENCE * (1 - pct);
+// ── Render ─────────────────────────────────────────────────
+function getPhaseLabel() {
+  if (!state.running) return state.timeLeft === 0 ? '¡LISTO!' : 'LISTO';
+  if (currentMode === 'tabata') return state.phase === 'work' ? 'TRABAJA' : 'DESCANSA';
+  if (currentMode === 'emom')   return 'TRABAJA';
+  if (currentMode === 'amrap')  return 'AMRAP';
+  return 'CUENTA ATRÁS';
 }
 
-function updatePhaseColor() {
-  const lbl = document.getElementById('phaseLabel');
-  const isWork = state.phase === 'work';
-  lbl.className = 'phase ' + (state.running ? (isWork ? 'work' : 'rest') : 'ready');
-  ringFg.style.stroke = state.running ? (isWork ? '#4dff91' : '#ff4d4d') : '#4d9fff';
+function updateDots() {
+  const ri = document.getElementById('roundsInfo');
+  const el = document.getElementById('roundDots');
+  if (currentMode === 'tabata' || currentMode === 'emom') {
+    ri.style.display = '';
+    document.getElementById('roundDisplay').textContent = state.round;
+    document.getElementById('totalRoundsDisplay').textContent = settings.rounds;
+    el.innerHTML = '';
+    for (let i = 1; i <= settings.rounds; i++) {
+      const d = document.createElement('div');
+      d.className = 'dot' + (i < state.round ? ' done' : i === state.round ? ' active' : '');
+      el.appendChild(d);
+    }
+  } else {
+    ri.style.display = 'none';
+    el.innerHTML = '';
+  }
 }
 
 function render() {
-  document.getElementById('timerDisplay').textContent = state.timeLeft;
-  document.getElementById('roundDisplay').textContent = state.round;
-  document.getElementById('totalRoundsDisplay').textContent = settings.rounds;
-  document.getElementById('phaseLabel').textContent =
-    state.running ? (state.phase === 'work' ? 'TRABAJA' : 'DESCANSA') : 'LISTO';
-  updatePhaseColor();
-  updateRing(state.timeLeft, state.total);
+  document.getElementById('timerDisplay').textContent = formatTimerVal(state.timeLeft);
+  const lbl = document.getElementById('phaseLabel');
+  lbl.textContent = getPhaseLabel();
+  const isWork = state.phase === 'work';
+  if (!state.running) {
+    lbl.className = 'phase ready';
+    ringFg.style.stroke = '#4d9fff';
+  } else {
+    lbl.className = 'phase ' + (isWork ? 'work' : 'rest');
+    ringFg.style.stroke = isWork ? '#4dff91' : '#ff4d4d';
+  }
+  ringFg.style.strokeDashoffset = CIRCUMFERENCE * (1 - state.timeLeft / state.total);
   updateDots();
+}
+
+// ── Tick ───────────────────────────────────────────────────
+function finish() {
+  clearInterval(ticker); ticker = null;
+  state.running = false; state.timeLeft = 0;
+  releaseWakeLock();
+  document.getElementById('btnStart').textContent = 'INICIAR';
+  beepFinish();
+  render();
 }
 
 function tick() {
   if (state.timeLeft <= 3 && state.timeLeft > 0) beepCountdown();
   state.timeLeft--;
+
   if (state.timeLeft < 0) {
-    if (state.phase === 'work') {
-      state.phase = 'rest';
-      state.timeLeft = settings.rest;
-      state.total = settings.rest;
-      beepRest();
-    } else {
-      if (state.round >= settings.rounds) {
-        clearInterval(interval);
-        state.running = false;
-        releaseWakeLock();
-        state.timeLeft = 0;
-        document.getElementById('phaseLabel').textContent = '¡LISTO!';
-        document.getElementById('btnStart').textContent = 'INICIAR';
-        beepFinish();
-        render();
-        return;
+    if (currentMode === 'tabata') {
+      if (state.phase === 'work') {
+        state.phase = 'rest'; state.timeLeft = settings.rest; state.total = settings.rest; beepRest();
+      } else {
+        if (state.round >= settings.rounds) { finish(); return; }
+        state.round++; state.phase = 'work'; state.timeLeft = settings.work; state.total = settings.work; beepWork();
       }
-      state.round++;
-      state.phase = 'work';
-      state.timeLeft = settings.work;
-      state.total = settings.work;
-      beepWork();
+    } else if (currentMode === 'emom') {
+      if (state.round >= settings.rounds) { finish(); return; }
+      state.round++; state.timeLeft = settings.interval; state.total = settings.interval; beepWork();
+    } else {
+      finish(); return;
     }
   }
   render();
 }
 
-let wakeLock = null;
-
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator) {
-      wakeLock = await navigator.wakeLock.request('screen');
-    }
-  } catch(e) {}
-}
-
-function releaseWakeLock() {
-  if (wakeLock) { wakeLock.release(); wakeLock = null; }
-}
-
+// ── Controls ───────────────────────────────────────────────
 function toggleStartPause() {
-  if (!ctx) ctx = new AudioCtx();
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (state.running) {
-    clearInterval(interval);
+    clearInterval(ticker); ticker = null;
     state.running = false;
     releaseWakeLock();
     document.getElementById('btnStart').textContent = 'CONTINUAR';
-    document.getElementById('phaseLabel').textContent = 'PAUSADO';
-    document.getElementById('phaseLabel').className = 'phase ready';
+    const lbl = document.getElementById('phaseLabel');
+    lbl.textContent = 'PAUSADO'; lbl.className = 'phase ready';
   } else {
     state.running = true;
     requestWakeLock();
     document.getElementById('btnStart').textContent = 'PAUSA';
-    beepWork();
+    if (currentMode !== 'amrap' && currentMode !== 'countdown') beepWork();
     render();
-    interval = setInterval(tick, 1000);
+    ticker = setInterval(tick, 1000);
   }
 }
 
 function reset() {
-  clearInterval(interval);
-  state = { running: false, phase: 'work', round: 1, timeLeft: settings.work, total: settings.work };
+  clearInterval(ticker); ticker = null;
+  releaseWakeLock();
+  initState();
   document.getElementById('btnStart').textContent = 'INICIAR';
-  ringFg.style.stroke = '#4d9fff';
   render();
 }
 
-function adjustSetting(key, delta) {
-  if (state.running) return;
-  const min = key === 'rounds' ? 1 : 5;
-  settings[key] = Math.max(min, settings[key] + delta);
-  document.getElementById(key + 'Val').textContent = settings[key] + (key === 'rounds' ? '' : 's');
-  document.getElementById('totalRoundsDisplay').textContent = settings.rounds;
-  if (key === 'work') { state.timeLeft = settings.work; state.total = settings.work; }
-  render();
-}
-
+// ── Init ───────────────────────────────────────────────────
+buildSettings();
+initState();
 render();
 </script>
 </body>
