@@ -249,10 +249,8 @@ function initState() {
 // ── Render ─────────────────────────────────────────────────
 function getPhaseLabel() {
   if (!state.running) return state.timeLeft === 0 ? '¡LISTO!' : 'LISTO';
-  if (currentMode === 'tabata') return state.phase === 'work' ? 'TRABAJA' : 'DESCANSA';
-  if (currentMode === 'emom')   return 'TRABAJA';
-  if (currentMode === 'amrap')  return 'AMRAP';
-  return 'CUENTA ATRÁS';
+  if (currentMode === 'tabata') return state.phase === 'work' ? '¡ADELANTE!' : 'DESCANSA';
+  return '¡ADELANTE!';
 }
 
 function updateDots() {
