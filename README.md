@@ -1,1 +1,1 @@
-# Tabata-timer-plus
+# Tabata-timer
